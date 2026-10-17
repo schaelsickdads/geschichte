@@ -153,10 +153,7 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
       </div>
       <div class="field">
         <label class="label" for="viertel">Veedel</label>
-        <input type="text" id="viertel" value="Ehrenfeld" list="veedel" autocomplete="off" maxlength="30">
-        <datalist id="veedel">
-          <option value="Altstadt"><option value="Nippes"><option value="Ehrenfeld"><option value="Sülz"><option value="Lindenthal"><option value="Südstadt"><option value="Deutz"><option value="Kalk"><option value="Mülheim"><option value="Porz"><option value="Rodenkirchen"><option value="Ostheim"><option value="Poll"><option value="Rath"><option value="Dellbrück"><option value="Chorweiler">
-        </datalist>
+        <input type="text" id="viertel" value="Porz" autocomplete="off" maxlength="30">
       </div>
       <div class="field">
         <label class="label" for="tier">Kuscheltier (nur der Name)</label>
@@ -209,7 +206,7 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var IDS = ['kind', 'alter', 'papa', 'viertel', 'tier', 'essen', 'hobby'];
-  var SICK = ['deutz', 'kalk', 'mülheim', 'muelheim', 'porz', 'ostheim', 'poll', 'rath', 'dellbrück', 'buchheim', 'vingst', 'höhenberg', 'humboldt', 'gremberg', 'brück', 'lind', 'zündorf', 'finkenberg', 'wahn', 'urbach'];
+  var SICK = ['deutz','kalk','mülheim','muelheim','porz','ostheim','merheim','meerheim','poll','rath','heumar','dellbrück','dellbrueck','holweide','buchforst','buchheim','dünnwald','flittard','stammheim','vingst','höhenberg','humboldt','gremberg','brück','neubrück','thielenbruch','höhenhaus','westhoven','ensen','lind','zündorf','langel','libur','elsdorf','finkenberg','wahn','urbach','grau-rheindorf','rheindorf','troisdorf','trostorf','spich','sieglar','oberlar','siegburg','niederkassel','lülsdorf','leverkusen','bergisch','bensberg','refrath','rösrath'];
 
   var STORY = [
     { t: 'Der Zettel unterm Kopfkissen', p: [
