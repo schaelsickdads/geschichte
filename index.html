@@ -109,6 +109,13 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
   .actions .btn.primary, .actions .btn.second { flex: 1 1 220px; }
   .actions .btn.third { flex: 1 1 100%; }
 }
+[hidden] { display: none !important; }
+.kids { display: flex; flex-direction: column; gap: 14px; }
+.kid { border: 2px dashed var(--teal); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.kidhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rm { font: inherit; font-family: var(--f-label); font-weight: 700; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--cream-dim); background: transparent; border: 2px solid var(--cream-dim); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+.rm:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.card .who { line-height: 1.2; }
 </style>
 </head>
 <body>
@@ -130,23 +137,10 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
 
   <section class="panel" aria-labelledby="h-form">
     <h2 id="h-form">Wer erlebt das Abenteuer?</h2>
-    <p class="hint">Das sind Beispielwerte. Einfach überschreiben, die Geschichte ändert sich sofort.</p>
+    <p class="hint">Das sind Beispielwerte. Einfach überschreiben, die Geschichte ändert sich sofort. Bei Geschwistern erleben alle zusammen ein Abenteuer.</p>
+    <div class="kids" id="kids"></div>
+    <button type="button" class="btn second" id="b-add">Geschwisterkind hinzufügen</button>
     <div class="grid">
-      <div class="field">
-        <label class="label" for="kind">Name des Kindes</label>
-        <input type="text" id="kind" value="Emil" autocomplete="off" maxlength="30">
-      </div>
-      <div class="field">
-        <label class="label" for="alter">Alter</label>
-        <input type="number" id="alter" value="5" min="1" max="14" inputmode="numeric">
-      </div>
-      <div class="field wide">
-        <span class="label" id="l-g">Junge oder Mädchen</span>
-        <div class="seg" role="radiogroup" aria-labelledby="l-g">
-          <label><input type="radio" name="g" id="g-m" value="m" checked><span>Junge</span></label>
-          <label><input type="radio" name="g" id="g-w" value="w"><span>Mädchen</span></label>
-        </div>
-      </div>
       <div class="field">
         <label class="label" for="papa">Papa (Vorname)</label>
         <input type="text" id="papa" value="Jonas" autocomplete="off" maxlength="30">
@@ -155,17 +149,9 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
         <label class="label" for="viertel">Veedel</label>
         <input type="text" id="viertel" value="Porz" autocomplete="off" maxlength="30">
       </div>
-      <div class="field">
-        <label class="label" for="tier">Kuscheltier (nur der Name)</label>
-        <input type="text" id="tier" value="Bruno" autocomplete="off" maxlength="30">
-      </div>
-      <div class="field">
+      <div class="field wide">
         <label class="label" for="essen">Lieblingsessen</label>
         <input type="text" id="essen" value="Pommes" autocomplete="off" maxlength="30">
-      </div>
-      <div class="field wide">
-        <label class="label" for="hobby">Macht am liebsten …</label>
-        <input type="text" id="hobby" value="Bagger gucken" autocomplete="off" maxlength="40">
       </div>
     </div>
   </section>
@@ -178,7 +164,7 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
 
   <section class="panel" aria-labelledby="h-share">
     <h2 id="h-share">Ab in die Dads-Gruppe</h2>
-    <p class="hint">So stellt sich das Kind vor. Ein Foto dazu, und die anderen Väter wissen, wer da gerade den Dom rettet.</p>
+    <p class="hint">So stellt sich die Familie vor. Ein Foto dazu, und die anderen Väter wissen, wer da gerade den Dom rettet.</p>
     <div class="card" id="steck"></div>
     <div class="actions">
       <a class="btn primary" id="b-wa" href="https://wa.me/" target="_blank" rel="noopener">Steckbrief in die Dads-Gruppe</a>
@@ -205,148 +191,208 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var IDS = ['kind', 'alter', 'papa', 'viertel', 'tier', 'essen', 'hobby'];
   var SICK = ['deutz','kalk','mülheim','muelheim','porz','ostheim','merheim','meerheim','poll','rath','heumar','dellbrück','dellbrueck','holweide','buchforst','buchheim','dünnwald','flittard','stammheim','vingst','höhenberg','humboldt','gremberg','brück','neubrück','thielenbruch','höhenhaus','westhoven','ensen','lind','zündorf','langel','libur','elsdorf','finkenberg','wahn','urbach','grau-rheindorf','rheindorf','troisdorf','trostorf','spich','sieglar','oberlar','siegburg','niederkassel','lülsdorf','leverkusen','bergisch','bensberg','refrath','rösrath'];
-
-  var STORY = [
-    { t: 'Der Zettel unterm Kopfkissen', p: [
-      'Samstagmorgen in {v}. {k} ist {a} alt und liebt nichts mehr als {h}. {Er} reibt sich die Augen, greift nach {t} und spürt unterm Kopfkissen etwas Raschelndes: einen winzigen Zettel, kaum größer als ein Kölschdeckel.',
-      'Darauf steht in krakeliger Schrift: „Der Decke Pitter hat seine Stimme verloren. Der Dom braucht dich. Komm heute. Dein Heinzelmännchen.“',
-      '{Papa} steht schon in der Tür, Kaffee in der Hand, Haare in alle Richtungen. „Ein Zettel vom Heinzelmännchen?“, murmelt er. „Das ist dienstlich. Schuhe an!“'
-    ]},
-    { t: 'Über den Rhein', p: [
-      'Dreimal „Schuhe an“, einmal Jacke suchen, und dann sitzen die beiden in der Bahn Richtung Dom. {t} darf am Fenster sitzen und passt auf.',
-      'Von der Haltestelle aus geht es zu Fuß über die Hohenzollernbrücke. Unten glitzert der Rhein, am Zaun hängen Tausende Liebesschlösser, und vor ihnen wächst der Dom in den Himmel: 157 Meter, so hoch, dass man den Kopf in den Nacken legen muss. {blick}'
-    ]},
-    { t: 'Der stumme Pitter', p: [
-      'Vor dem Hauptportal wartet schon jemand. Er ist so klein wie eine Kölschstange, trägt eine spitze rote Mütze und hat einen Bart bis zum Gürtel. „Ich bin Schäng, Obergeselle der Heinzelmännchen“, sagt er. „Danke, dass ihr gekommen seid.“',
-      'Schäng erzählt, dass dem Decke Pitter, der größten Glocke im Dom, die Stimme weggeblieben ist. Ohne ihn gibt es kein richtiges Läuten, und ganz Köln wäre ein bisschen traurig. „Um seine Stimme zurückzuholen, brauchen wir drei Dinge“, sagt Schäng. „Ein Lachen, ein Lied und einen kölschen Spruch.“',
-      '{Papa} zieht eine Augenbraue hoch. „Nur drei Dinge? Dann sind wir zum Mittagessen zurück.“ Das ist ein Irrtum. Aber das weiß er noch nicht.'
-    ]},
-    { t: 'Das Lachen', p: [
-      'Das erste Ding liegt am Rheinufer. Auf der Treppe hinunter stolpert Papa über den eigenen Schnürsenkel, rudert mit den Armen wie eine Windmühle und rettet im letzten Moment den Kaffeebecher. {k} lacht. Erst leise, dann laut, dann so laut, dass die Möwen vom Geländer aufflattern.',
-      'Schäng fängt das Lachen mit seiner Mütze auf und stopft es in ein winziges Säckchen. „Eins!“, ruft er.'
-    ]},
-    { t: 'Das Lied', p: [
-      'Das zweite Ding ist schwieriger. Auf dem Roncalliplatz spielt ein Straßenmusiker Gitarre, und Schäng flüstert: „Ein Lied, das noch keiner kennt.“ {k} überlegt. Dann holt {er} tief Luft und singt etwas, das {er} sich gerade ausgedacht hat. Es handelt von {e}, von {t} und von nichts anderem als {h}.',
-      'Der Text ergibt keinen Sinn. Es ist trotzdem das Schönste, was der Platz heute gehört hat. Ein paar Touristen klatschen. Papa filmt, natürlich hochkant. „Zwei!“, sagt Schäng und wischt sich eine Träne aus dem Bart.'
-    ]},
-    { t: 'Der kölsche Spruch', p: [
-      'Jetzt fehlt nur noch der Spruch. Schäng zieht die beiden in den Schatten der Domtürme. „Der muss so kölsch sein, dass der Pitter ihn bis ganz oben hört.“',
-      '{k} schaut zu Papa. Papa geht in die Hocke und sagt leise: „Das Wichtigste, was ich weiß: Et hätt noch emmer jot jejange.“',
-      '{k} holt Luft und ruft es, so laut {er} kann, gegen die Steinwände: „ET HÄTT NOCH EMMER JOT JEJANGE!“ (Das ist übrigens Artikel 3 im Kölschen Grundgesetz, falls später jemand fragt.) Der Ruf hallt zwischen den Türmen hoch und höher. Ganz oben, in der dunklen Glockenstube, regt sich etwas.'
-    ]},
-    { t: 'Der Glockenschlag', p: [
-      'Dann schlägt der Decke Pitter. Tief, warm, ein Ton, der in der Brust kribbelt. Die Tauben steigen auf, der Straßenmusiker hört auf zu spielen, und irgendwo ruft jemand „Alaaf!“, obwohl gar kein Karneval ist.',
-      'Schäng macht einen Luftsprung, so hoch, wie ein Heinzelmännchen eben springen kann, also ungefähr bis zum Schuh. „Ihr habt Köln gerettet!“, ruft er. „Ab heute ist {k} Ehren-Heinzelmännchen!“ Er überreicht {k} eine winzige rote Mütze. Sie passt natürlich nur {t}.',
-      'Und zu Papa sagt er: „Du bist Ehren-Träger. Du hast den ganzen Tag Jacke, Rucksack und {t} getragen.“ Papa nickt würdevoll. Er hat es immer gewusst.'
-    ]},
-    { t: 'Der Heimweg', p: [
-      'Auf dem Heimweg gibt es, wie es sich gehört, {e}. {Papa} bekommt ein Kölsch aus der Stange, das er sich wirklich verdient hat.',
-      'Abends im Bett fragt {k}: „Papa, hört der Pitter uns jetzt immer?“ „Immer“, sagt Papa. „Und wenn mal was schiefgeht …“ „… hätt et noch emmer jot jejange“, murmelt {k}, schon halb im Schlaf.',
-      'Und wer nachts in {v} ganz genau hinhört, kann ihn brummen hören: Gute Nacht, {k}.'
-    ]}
+  var DEF = [
+    { name: 'Emil', age: '5', girl: false, tier: 'Bruno', hobby: 'Bagger gucken' },
+    { name: 'Lena', age: '3', girl: true, tier: 'Mimi', hobby: 'Prinzessinnen' },
+    { name: 'Tom', age: '7', girl: false, tier: 'Hase', hobby: 'Fußball' }
   ];
+  var MAXK = 3;
+  var kids = [copyKid(DEF[0])];
 
+  function copyKid(k) { return { name: k.name, age: k.age, girl: k.girl, tier: k.tier, hobby: k.hobby }; }
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
   function wrap(s) { return '\u0001' + s + '\u0002'; }
-
-  function values() {
-    var raw = {};
-    IDS.forEach(function (id) { raw[id] = ($(id).value || '').trim(); });
-    var n = parseInt(raw.alter, 10);
-    if (!(n >= 1)) n = 5;
-    if (n > 14) n = 14;
-    var girl = $('g-w').checked;
-    var kind = cap(raw.kind) || 'Emil';
-    var viertel = cap(raw.viertel) || 'Köln';
-    var papa = cap(raw.papa);
-    var tier = cap(raw.tier) || 'Bruno';
-    var essen = cap(raw.essen) || 'Pommes';
-    var hobby = raw.hobby || 'Bagger gucken';
-    var alterText = n === 1 ? 'ein Jahr' : n + ' Jahre';
-    var sick = SICK.some(function (s) { return viertel.toLowerCase().indexOf(s) === 0; });
-    return { kind: kind, n: n, alterText: alterText, viertel: viertel, papa: papa, tier: tier, essen: essen, hobby: hobby, girl: girl, sick: sick };
-  }
-
-  function fill(tpl, v) {
-    var er = v.girl ? 'sie' : 'er';
-    var blick = v.sick
-      ? 'Wir wohnen auf der Schäl Sick, sagt Papa gern, und von der Schäl Sick hat man bekanntlich den schönsten Blick auf den Dom.'
-      : 'Papa sagt gern, den schönsten Blick auf den Dom habe man von der Schäl Sick, der anderen Rheinseite. {k} nickt ernst, als wüsste {er} das schon lange.';
-    var map = {
-      k: wrap(v.kind), a: wrap(v.alterText), v: wrap(v.viertel), t: wrap(v.tier), e: wrap(v.essen), h: wrap(v.hobby),
-      er: er, Er: cap(er),
-      Papa: v.papa ? 'Papa ' + wrap(v.papa) : 'Papa'
-    };
-    var out = tpl.replace('{blick}', blick);
-    for (var i = 0; i < 2; i++) {
-      out = out.replace(/\{(\w+)\}/g, function (m, key) { return map.hasOwnProperty(key) ? map[key] : m; });
-    }
-    return out;
-  }
-
+  function list(a) { return a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' und ' + a[a.length - 1]; }
+  function S(c, one, many) { return c.pl ? many : one; }
   function plain(s) { return s.replace(/[\u0001\u0002]/g, ''); }
   function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function escA(s) { return esc(s).replace(/"/g, '&quot;'); }
   function html(s) { return esc(s).replace(/\u0001/g, '<span class="v">').replace(/\u0002/g, '</span>'); }
 
-  function steckbrief(v) {
-    return [
-      'Moin Dads! Das ist ' + v.kind + ' (' + v.n + ') aus ' + v.viertel,
-      'Papa: ' + (v.papa || 'ich'),
-      'Liebt: ' + v.hobby,
-      'Kuscheltier: ' + v.tier,
-      'Lieblingsessen: ' + v.essen
-    ].join('\n');
+  /* Kontext aus den Eingaben bauen */
+  function ctx() {
+    var ks = kids.map(function (k, i) {
+      var n = parseInt(k.age, 10);
+      if (!(n >= 1)) n = parseInt(DEF[i].age, 10);
+      if (n > 14) n = 14;
+      return {
+        name: cap((k.name || '').trim()) || DEF[i].name,
+        n: n,
+        girl: !!k.girl,
+        tier: cap((k.tier || '').trim()) || DEF[i].tier,
+        hobby: (k.hobby || '').trim() || DEF[i].hobby
+      };
+    });
+    var viertel = cap(($('viertel').value || '').trim()) || 'Köln';
+    var papa = cap(($('papa').value || '').trim());
+    var essen = cap(($('essen').value || '').trim()) || 'Pommes';
+    var c = { kids: ks, pl: ks.length > 1, v: wrap(viertel), vPlain: viertel, e: wrap(essen), ePlain: essen, papaName: papa };
+    c.k = wrap(ks[0].name);
+    c.second = ks[1] ? wrap(ks[1].name) : '';
+    c.third = ks[2] ? wrap(ks[2].name) : '';
+    c.K = list(ks.map(function (k) { return wrap(k.name); }));
+    c.T = list(ks.map(function (k) { return wrap(k.tier); }));
+    c.H = list(ks.map(function (k) { return wrap(k.hobby); }));
+    c.er = ks[0].girl ? 'sie' : 'er';
+    c.Er = cap(c.er);
+    c.Papa = papa ? 'Papa ' + wrap(papa) : 'Papa';
+    c.sick = SICK.some(function (s) { return viertel.toLowerCase().indexOf(s) === 0; });
+    c.intro = ks.map(function (k, i) {
+      var alt = k.n === 1 ? 'ein Jahr alt' : k.n + ' Jahre alt';
+      return i === 0
+        ? wrap(k.name) + ' ist ' + wrap(alt) + ' und liebt nichts mehr als ' + wrap(k.hobby) + '.'
+        : wrap(k.name) + ' ist ' + wrap(alt) + ' und liebt ' + wrap(k.hobby) + ' über alles.';
+    }).join(' ');
+    c.blick = c.sick
+      ? 'Wir wohnen auf der Schäl Sick, sagt Papa gern, und von der Schäl Sick hat man bekanntlich den schönsten Blick auf den Dom.'
+      : 'Papa sagt gern, den schönsten Blick auf den Dom habe man von der Schäl Sick, der anderen Rheinseite. ' +
+        S(c, c.k + ' nickt ernst, als wüsste ' + c.er + ' das schon lange.', c.K + ' nicken ernst, als wüssten sie das schon lange.');
+    return c;
   }
+
+  var CH = [
+    { t: 'Der Zettel unterm Kopfkissen', p: function (c) { return [
+      'Samstagmorgen in ' + c.v + '. ' + c.intro + ' ' + S(c,
+        c.Er + ' reibt sich die Augen, greift nach ' + c.T + ' und spürt unterm Kopfkissen etwas Raschelndes: einen winzigen Zettel, kaum größer als ein Kölschdeckel.',
+        'Alle reiben sich die Augen und greifen nach ' + c.T + '. Unter dem Kopfkissen von ' + c.k + ' raschelt etwas: ein winziger Zettel, kaum größer als ein Kölschdeckel.'),
+      'Darauf steht in krakeliger Schrift: „Der Decke Pitter hat seine Stimme verloren. ' + S(c, 'Der Dom braucht dich. Komm heute. Dein Heinzelmännchen.', 'Der Dom braucht euch. Kommt heute. Euer Heinzelmännchen.') + '“',
+      c.Papa + ' steht schon in der Tür, Kaffee in der Hand, Haare in alle Richtungen. „Ein Zettel vom Heinzelmännchen?“, murmelt er. „Das ist dienstlich. Schuhe an!“'
+    ]; } },
+    { t: 'Über den Rhein', p: function (c) { return [
+      S(c,
+        'Dreimal „Schuhe an“, einmal Jacke suchen, und dann sitzen die beiden in der Bahn Richtung Dom. ' + c.T + ' darf am Fenster sitzen und passt auf.',
+        'Dreimal „Schuhe an“, zweimal Streit um den Fensterplatz, einmal Jacke suchen, und dann sitzen alle in der Bahn Richtung Dom. ' + c.T + ' dürfen am Fenster sitzen und passen auf.'),
+      'Von der Haltestelle aus geht es zu Fuß über die Hohenzollernbrücke. Unten glitzert der Rhein, am Zaun hängen Tausende Liebesschlösser, und vor ihnen wächst der Dom in den Himmel: 157 Meter, so hoch, dass man den Kopf in den Nacken legen muss. ' + c.blick
+    ]; } },
+    { t: 'Der stumme Pitter', p: function (c) { return [
+      'Vor dem Hauptportal wartet schon jemand. Er ist so klein wie eine Kölschstange, trägt eine spitze rote Mütze und hat einen Bart bis zum Gürtel. „Ich bin Schäng, Obergeselle der Heinzelmännchen“, sagt er. „Danke, dass ihr gekommen seid.“',
+      'Schäng erzählt, dass dem Decke Pitter, der größten Glocke im Dom, die Stimme weggeblieben ist. Ohne ihn gibt es kein richtiges Läuten, und ganz Köln wäre ein bisschen traurig. „Um seine Stimme zurückzuholen, brauchen wir drei Dinge“, sagt Schäng. „Ein Lachen, ein Lied und einen kölschen Spruch.“',
+      c.Papa + ' zieht eine Augenbraue hoch. „Nur drei Dinge? Dann sind wir zum Mittagessen zurück.“ Das ist ein Irrtum. Aber das weiß er noch nicht.'
+    ]; } },
+    { t: 'Das Lachen', p: function (c) { return [
+      'Das erste Ding liegt am Rheinufer. Auf der Treppe hinunter stolpert Papa über den eigenen Schnürsenkel, rudert mit den Armen wie eine Windmühle und rettet im letzten Moment den Kaffeebecher. ' + S(c,
+        c.k + ' lacht. Erst leise, dann laut, dann so laut, dass die Möwen vom Geländer aufflattern.',
+        c.K + ' lachen. Erst leise, dann laut, dann so laut, dass die Möwen vom Geländer aufflattern. Als ' + c.second + ' mitten im Lachen Schluckauf bekommt, geht es von vorne los.'),
+      'Schäng fängt das Lachen mit seiner Mütze auf und stopft es in ein winziges Säckchen. „Eins!“, ruft er.'
+    ]; } },
+    { t: 'Das Lied', p: function (c) { return [
+      'Das zweite Ding ist schwieriger. Auf dem Roncalliplatz spielt ein Straßenmusiker Gitarre, und Schäng flüstert: „Ein Lied, das noch keiner kennt.“ ' + S(c,
+        c.k + ' überlegt. Dann holt ' + c.er + ' tief Luft und singt etwas, das ' + c.er + ' sich gerade ausgedacht hat. Es handelt von ' + c.e + ', von ' + c.T + ' und von nichts anderem als ' + c.H + '.',
+        c.K + ' überlegen kurz. Dann holen sie tief Luft und singen etwas, das sie sich gerade ausgedacht haben, jeder eine andere Strophe, alle gleichzeitig. Es handelt von ' + c.e + ', von ' + c.T + ' und von nichts anderem als ' + c.H + '.'),
+      'Der Text ergibt keinen Sinn. Es ist trotzdem das Schönste, was der Platz heute gehört hat. Ein paar Touristen klatschen. Papa filmt, natürlich hochkant. „Zwei!“, sagt Schäng und wischt sich eine Träne aus dem Bart.'
+    ]; } },
+    { t: 'Der kölsche Spruch', p: function (c) { return [
+      'Jetzt fehlt nur noch der Spruch. Schäng zieht ' + S(c, 'die beiden', 'alle') + ' in den Schatten der Domtürme. „Der muss so kölsch sein, dass der Pitter ihn bis ganz oben hört.“',
+      S(c, c.k + ' schaut zu Papa.', c.K + ' schauen zu Papa.') + ' Papa geht in die Hocke und sagt leise: „Das Wichtigste, was ich weiß: Et hätt noch emmer jot jejange.“',
+      S(c, c.k + ' holt Luft und ruft es, so laut ' + c.er + ' kann,', c.K + ' holen Luft und rufen es, so laut sie können,') + ' gegen die Steinwände: „ET HÄTT NOCH EMMER JOT JEJANGE!“ (Das ist übrigens Artikel 3 im Kölschen Grundgesetz, falls später jemand fragt.) Der Ruf hallt zwischen den Türmen hoch und höher. Ganz oben, in der dunklen Glockenstube, regt sich etwas.'
+    ]; } },
+    { t: 'Der Glockenschlag', p: function (c) { return [
+      'Dann schlägt der Decke Pitter. Tief, warm, ein Ton, der in der Brust kribbelt. Die Tauben steigen auf, der Straßenmusiker hört auf zu spielen, und irgendwo ruft jemand „Alaaf!“, obwohl gar kein Karneval ist.',
+      'Schäng macht einen Luftsprung, so hoch, wie ein Heinzelmännchen eben springen kann, also ungefähr bis zum Schuh. „Ihr habt Köln gerettet!“, ruft er. ' + S(c,
+        '„Ab heute ist ' + c.k + ' Ehren-Heinzelmännchen!“ Er überreicht ' + c.k + ' eine winzige rote Mütze. Sie passt natürlich nur ' + c.T + '.',
+        '„Ab heute sind ' + c.K + ' Ehren-Heinzelmännchen!“ Er überreicht jedem eine winzige rote Mütze. Sie passen natürlich nur ' + c.T + '.'),
+      'Und zu Papa sagt er: „Du bist Ehren-Träger. Du hast den ganzen Tag ' + S(c, 'Jacke, Rucksack und ' + c.T, 'Jacken, Rucksäcke und das ganze Kuscheltier-Team') + ' getragen.“ Papa nickt würdevoll. Er hat es immer gewusst.'
+    ]; } },
+    { t: 'Der Heimweg', p: function (c) { return [
+      'Auf dem Heimweg gibt es, wie es sich gehört, ' + c.e + '. ' + c.Papa + ' bekommt ein Kölsch aus der Stange, das er sich wirklich verdient hat.',
+      S(c,
+        'Abends im Bett fragt ' + c.k + ': „Papa, hört der Pitter uns jetzt immer?“ „Immer“, sagt Papa. „Und wenn mal was schiefgeht …“ „… hätt et noch emmer jot jejange“, murmelt ' + c.k + ', schon halb im Schlaf.',
+        'Abends im Bett fragt ' + c.k + ': „Papa, hört der Pitter uns jetzt immer?“ „Immer“, sagt Papa. „Und wenn mal was schiefgeht …“ „… hätt et noch emmer jot jejange“, murmelt ' + c.second + ', schon halb im Schlaf.' + (c.third ? ' ' + c.third + ' schnarcht längst.' : '')),
+      'Und wer nachts in ' + c.v + ' ganz genau hinhört, kann ihn brummen hören: Gute Nacht, ' + c.K + '.'
+    ]; } }
+  ];
+
+  function steckbrief(c) {
+    var ks = c.kids, names = list(ks.map(function (k) { return k.name + ' (' + k.n + ')'; }));
+    var lines = [];
+    if (!c.pl) {
+      var k = ks[0];
+      lines.push('Moin Dads! Das ist ' + names + ' aus ' + c.vPlain);
+      lines.push('Papa: ' + (c.papaName || 'ich'));
+      lines.push('Liebt: ' + k.hobby);
+      lines.push('Kuscheltier: ' + k.tier);
+    } else {
+      lines.push('Moin Dads! Das sind ' + names + ' aus ' + c.vPlain);
+      lines.push('Papa: ' + (c.papaName || 'ich'));
+      ks.forEach(function (k) { lines.push(k.name + ': liebt ' + k.hobby + ', Kuscheltier ' + k.tier); });
+    }
+    lines.push('Lieblingsessen: ' + c.ePlain);
+    return lines.join('\n');
+  }
+  function row(k, val) { return '<div class="row"><b>' + esc(k) + '</b><span>' + esc(val) + '</span></div>'; }
 
   var current = { full: '', card: '' };
 
   function render() {
-    var v = values();
-    var box = $('story');
-    var parts = [];
-    var words = 0;
-    var txt = [];
-    STORY.forEach(function (c, i) {
-      var paras = c.p.map(function (p) { return fill(p, v); });
-      parts.push('<section class="chapter"><span class="tag">Kapitel ' + (i + 1) + '</span><h3>' + esc(c.t) + '</h3>' +
+    var c = ctx();
+    var parts = [], txt = [], words = 0;
+    CH.forEach(function (ch, i) {
+      var paras = ch.p(c);
+      parts.push('<section class="chapter"><span class="tag">Kapitel ' + (i + 1) + '</span><h3>' + esc(ch.t) + '</h3>' +
         paras.map(function (p) { return '<p>' + html(p) + '</p>'; }).join('') + '</section>');
       var pp = paras.map(plain);
       pp.forEach(function (p) { words += p.split(/\s+/).length; });
-      txt.push('*' + c.t + '*\n' + pp.join('\n\n'));
+      txt.push('*' + ch.t + '*\n' + pp.join('\n\n'));
     });
     parts.push('<p class="ende">Ende. Et hätt noch emmer jot jejange.</p>');
-    box.innerHTML = parts.join('');
+    $('story').innerHTML = parts.join('');
     $('dauer').textContent = 'ca. ' + Math.max(1, Math.round(words / 130)) + ' Min. Vorlesen';
 
-    var card = steckbrief(v);
-    current.card = card;
+    current.card = steckbrief(c);
     current.full = '*Der Decke Pitter hat keine Stimme mehr*\n\n' + txt.join('\n\n') +
       '\n\nEnde. Et hätt noch emmer jot jejange.\n\n—\nSchälsick Dads · Kölsch. Kinder. Chaos.';
 
-    $('steck').innerHTML =
-      '<span class="who">' + esc(v.kind) + ', ' + v.n + '</span>' +
-      row('Veedel', v.viertel) + row('Papa', v.papa || 'der Papa') + row('Macht am liebsten', v.hobby) +
-      row('Kuscheltier', v.tier) + row('Lieblingsessen', v.essen);
+    var who = list(c.kids.map(function (k) { return k.name + ', ' + k.n; }).map(function (s, i) { return i === 0 && !c.pl ? s : s; }));
+    var html2 = '<span class="who">' + esc(c.pl ? list(c.kids.map(function (k) { return k.name + ' (' + k.n + ')'; })) : c.kids[0].name + ', ' + c.kids[0].n) + '</span>';
+    html2 += row('Veedel', c.vPlain) + row('Papa', c.papaName || 'der Papa');
+    if (!c.pl) {
+      html2 += row('Macht am liebsten', c.kids[0].hobby) + row('Kuscheltier', c.kids[0].tier);
+    } else {
+      c.kids.forEach(function (k) { html2 += row(k.name, k.hobby + ' · ' + k.tier); });
+    }
+    html2 += row('Lieblingsessen', c.ePlain);
+    $('steck').innerHTML = html2;
     $('b-wa').href = 'https://wa.me/?text=' + encodeURIComponent(current.card);
   }
-  function row(k, val) { return '<div class="row"><b>' + esc(k) + '</b><span>' + esc(val) + '</span></div>'; }
+
+  /* Kinderformular */
+  function kidHtml(k, i) {
+    var p = 'k' + i + '-';
+    return '<div class="kid" data-i="' + i + '">' +
+      '<div class="kidhead"><span class="label">Kind ' + (i + 1) + '</span>' +
+      (kids.length > 1 ? '<button type="button" class="rm" data-rm="' + i + '">Entfernen</button>' : '') + '</div>' +
+      '<div class="grid">' +
+      '<div class="field"><label class="label" for="' + p + 'name">Name</label><input type="text" id="' + p + 'name" data-f="name" value="' + escA(k.name) + '" autocomplete="off" maxlength="30"></div>' +
+      '<div class="field"><label class="label" for="' + p + 'age">Alter</label><input type="number" id="' + p + 'age" data-f="age" value="' + escA(String(k.age)) + '" min="1" max="14" inputmode="numeric"></div>' +
+      '<div class="field wide"><span class="label" id="' + p + 'lg">Junge oder Mädchen</span><div class="seg" role="radiogroup" aria-labelledby="' + p + 'lg">' +
+      '<label><input type="radio" name="' + p + 'g" id="' + p + 'gm" data-f="g" value="m"' + (k.girl ? '' : ' checked') + '><span>Junge</span></label>' +
+      '<label><input type="radio" name="' + p + 'g" id="' + p + 'gw" data-f="g" value="w"' + (k.girl ? ' checked' : '') + '><span>Mädchen</span></label></div></div>' +
+      '<div class="field"><label class="label" for="' + p + 'tier">Kuscheltier (nur der Name)</label><input type="text" id="' + p + 'tier" data-f="tier" value="' + escA(k.tier) + '" autocomplete="off" maxlength="30"></div>' +
+      '<div class="field"><label class="label" for="' + p + 'hobby">Macht am liebsten …</label><input type="text" id="' + p + 'hobby" data-f="hobby" value="' + escA(k.hobby) + '" autocomplete="off" maxlength="40"></div>' +
+      '</div></div>';
+  }
+  function drawKids() {
+    $('kids').innerHTML = kids.map(kidHtml).join('');
+    $('b-add').hidden = kids.length >= MAXK;
+  }
 
   function save() {
     try {
-      var o = {};
-      IDS.forEach(function (id) { o[id] = $(id).value; });
-      o.g = $('g-w').checked ? 'w' : 'm';
-      localStorage.setItem('sd-gutenacht', JSON.stringify(o));
+      localStorage.setItem('sd-gutenacht2', JSON.stringify({ kids: kids, papa: $('papa').value, viertel: $('viertel').value, essen: $('essen').value }));
     } catch (e) {}
   }
   function load() {
     try {
-      var o = JSON.parse(localStorage.getItem('sd-gutenacht') || 'null');
+      var o = JSON.parse(localStorage.getItem('sd-gutenacht2') || 'null');
       if (!o) return;
-      IDS.forEach(function (id) { if (typeof o[id] === 'string') $(id).value = o[id]; });
-      if (o.g === 'w') $('g-w').checked = true;
+      if (Array.isArray(o.kids) && o.kids.length) {
+        kids = o.kids.slice(0, MAXK).map(function (k, i) {
+          var d = DEF[i];
+          return { name: typeof k.name === 'string' ? k.name : d.name, age: String(k.age == null ? d.age : k.age), girl: !!k.girl, tier: typeof k.tier === 'string' ? k.tier : d.tier, hobby: typeof k.hobby === 'string' ? k.hobby : d.hobby };
+        });
+      }
+      ['papa', 'viertel', 'essen'].forEach(function (id) { if (typeof o[id] === 'string') $(id).value = o[id]; });
     } catch (e) {}
   }
 
@@ -373,12 +419,34 @@ input:focus-visible, .btn:focus-visible, .seg input:focus-visible + span { outli
   $('b-copy').addEventListener('click', function () { copy(current.full, 'Geschichte kopiert. Jetzt einfügen und abschicken.', '2'); });
   $('b-card').addEventListener('click', function () { copy(current.card, 'Steckbrief kopiert.', ''); });
 
-  load();
-  var inputs = document.querySelectorAll('input');
-  for (var i = 0; i < inputs.length; i++) {
-    inputs[i].addEventListener('input', function () { render(); save(); });
-    inputs[i].addEventListener('change', function () { render(); save(); });
+  function onKid(e) {
+    var t = e.target, f = t.getAttribute && t.getAttribute('data-f');
+    if (!f) return;
+    var box = t.closest('.kid'); if (!box) return;
+    var i = parseInt(box.getAttribute('data-i'), 10);
+    if (f === 'g') { if (t.checked) kids[i].girl = t.value === 'w'; } else { kids[i][f] = t.value; }
+    render(); save();
   }
+  $('kids').addEventListener('input', onKid);
+  $('kids').addEventListener('change', onKid);
+  $('kids').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[data-rm]') : null;
+    if (!b) return;
+    kids.splice(parseInt(b.getAttribute('data-rm'), 10), 1);
+    drawKids(); render(); save();
+  });
+  $('b-add').addEventListener('click', function () {
+    if (kids.length >= MAXK) return;
+    kids.push(copyKid(DEF[kids.length]));
+    drawKids(); render(); save();
+    var last = $('k' + (kids.length - 1) + '-name'); if (last) last.focus();
+  });
+  ['papa', 'viertel', 'essen'].forEach(function (id) {
+    $(id).addEventListener('input', function () { render(); save(); });
+  });
+
+  load();
+  drawKids();
   render();
 })();
 </script>
